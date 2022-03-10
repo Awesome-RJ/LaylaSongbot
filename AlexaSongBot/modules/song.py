@@ -12,13 +12,11 @@ from AlexaSongBot.sql.chat_sql import add_chat_to_db
 
 def yt_search(song):
     videosSearch = VideosSearch(song, limit=1)
-    result = videosSearch.result()
-    if not result:
-        return False
-    else:
+    if result := videosSearch.result():
         video_id = result["result"][0]["id"]
-        url = f"https://youtu.be/{video_id}"
-        return url
+        return f"https://youtu.be/{video_id}"
+    else:
+        return False
 
 
 @app.on_message(filters.create(ignore_blacklisted_users) & filters.command("song"))
@@ -26,7 +24,7 @@ async def song(client, message):
     chat_id = message.chat.id
     user_id = message.from_user["id"]
     add_chat_to_db(str(chat_id))
-    args = get_arg(message) + " " + "song"
+    args = f'{get_arg(message)} song'
     if args.startswith(" "):
         await message.reply("Enter a song name. Check /help")
         return ""
